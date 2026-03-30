@@ -1,0 +1,33 @@
+# Node dependencies
+/node_modules
+
+# Environment
+.env
+
+# Build output
+/dist
+/build
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Testing
+/coverage
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# Misc
+.nodemon*
+.dump/
