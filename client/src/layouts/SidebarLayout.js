@@ -19,7 +19,7 @@ import Topbar  from "../components/Topbar";
 import Footer  from "../components/Footer";
 import useLocalStorage from "../hooks/useLocalStorage";
 
-const SidebarLayout = ({ children, pageTitle }) => {
+const SidebarLayout = ({ children, pageTitle, noPadding = false }) => {
   // Persist collapse preference across sessions
   const [collapsed, setCollapsed]   = useLocalStorage("sidebar-collapsed", false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -42,10 +42,8 @@ const SidebarLayout = ({ children, pageTitle }) => {
         />
 
         {/* Scrollable content area */}
-        <main className="flex-1 overflow-y-auto">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            {children}
-          </div>
+        <main className={`flex-1 overflow-y-auto ${noPadding ? "" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"}`}>
+          {children}
         </main>
 
         <Footer />

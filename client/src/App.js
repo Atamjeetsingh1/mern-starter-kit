@@ -9,11 +9,18 @@ import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import store from "./app/store";
 import AppRoutes from "./routes/AppRoutes";
+import useSocket from "./hooks/useSocket";
+
+const AppContent = () => {
+  // Initialize the global socket connection tied to the auth session
+  useSocket();
+  return <AppRoutes />;
+};
 
 const App = () => (
   <Provider store={store}>
     <BrowserRouter>
-      <AppRoutes />
+      <AppContent />
     </BrowserRouter>
   </Provider>
 );

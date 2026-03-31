@@ -21,6 +21,7 @@ const logger = require("./utils/logger");
 const authRoutes = require("./routes/auth.routes");
 const userRoutes = require("./routes/user.routes");
 const uploadRoutes = require("./routes/upload.routes");
+const chatRoutes = require("./routes/chat.routes");
 const errorMiddleware = require("./middleware/error.middleware");
 const AppError = require("./utils/AppError");
 const { HTTP_STATUS } = require("./constants");
@@ -110,6 +111,7 @@ app.get("/health", (_req, res) => {
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/upload", uploadRoutes);
+app.use("/api/v1/chat", chatRoutes);
 
 // ── 404 handler (must come after all routes) ──────────────────────────────
 app.use((req, _res, next) => {

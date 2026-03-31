@@ -48,11 +48,38 @@ const MESSAGES = Object.freeze({
   SERVER_ERROR: "An internal server error occurred.",
   NOT_FOUND: "Resource not found.",
   VALIDATION_ERROR: "Validation failed.",
+
+  // Chat
+  CONVERSATION_CREATED: "Conversation started.",
+  CONVERSATIONS_FETCHED: "Conversations fetched successfully.",
+  MESSAGES_FETCHED: "Messages fetched successfully.",
+  MESSAGE_SENT: "Message sent.",
+  CONVERSATION_READ: "Conversation marked as read.",
+  CONVERSATION_NOT_FOUND: "Conversation not found.",
 });
 
 // ── Cookie names ───────────────────────────────────────────────────────────
 const COOKIE_NAMES = Object.freeze({
   REFRESH_TOKEN: "refreshToken",
+});
+
+// ── Socket event names (shared constants) ─────────────────────────────────
+const CHAT_EVENTS = Object.freeze({
+  // Client → Server
+  JOIN_CONVERSATION: "join_conversation",
+  LEAVE_CONVERSATION: "leave_conversation",
+  SEND_MESSAGE: "send_message",
+  TYPING: "typing",
+  STOP_TYPING: "stop_typing",
+  MARK_SEEN: "mark_seen",
+  // Server → Client
+  RECEIVE_MESSAGE: "receive_message",
+  MESSAGE_STATUS_UPDATE: "message_status_update",
+  USER_ONLINE: "user_online",
+  USER_OFFLINE: "user_offline",
+  TYPING_INDICATOR: "typing_indicator",
+  STOP_TYPING_INDICATOR: "stop_typing_indicator",
+  ERROR: "chat_error",
 });
 
 // ── Token types ────────────────────────────────────────────────────────────
@@ -67,4 +94,5 @@ module.exports = {
   MESSAGES,
   COOKIE_NAMES,
   TOKEN_TYPES,
+  CHAT_EVENTS,
 };

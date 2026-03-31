@@ -17,6 +17,7 @@ import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
 import DashboardPage from "../pages/DashboardPage";
 import ProfilePage from "../pages/ProfilePage";
+import ChatPage from "../pages/ChatPage";
 import NotFoundPage from "../pages/NotFoundPage";
 import UnauthorizedPage from "../pages/UnauthorizedPage";
 
@@ -51,6 +52,16 @@ const AppRoutes = () => (
         <PrivateRoute>
           <SidebarLayout pageTitle="Profile">
             <ProfilePage />
+          </SidebarLayout>
+        </PrivateRoute>
+      }
+    />
+    <Route
+      path={ROUTES.CHAT}
+      element={
+        <PrivateRoute>
+          <SidebarLayout pageTitle="Messages" noPadding>
+            <ChatPage />
           </SidebarLayout>
         </PrivateRoute>
       }
