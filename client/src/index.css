@@ -1,17 +1,213 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   index.css
+   Global stylesheet — Tailwind directives + project-wide base styles.
+   Import Inter font, define CSS variables, add custom utilities.
+───────────────────────────────────────────────────────────────────────── */
+
+/* Google Inter font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* Tailwind layers */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* ── CSS custom properties (design tokens) ───────────────────────────────── */
+:root {
+  /* Colours */
+  --color-primary:       #4f46e5;
+  --color-primary-light: #6366f1;
+  --color-primary-dark:  #4338ca;
+  --color-danger:        #ef4444;
+  --color-success:       #22c55e;
+  --color-warning:       #f59e0b;
+
+  /* Spacing */
+  --sidebar-width:          256px;
+  --sidebar-collapsed-width: 68px;
+  --topbar-height:           64px;
+
+  /* Transitions */
+  --transition-fast:   150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow:   400ms ease;
+
+  /* Z-index layers */
+  --z-dropdown: 40;
+  --z-sticky:   50;
+  --z-modal:    60;
+  --z-toast:    9999;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+/* ── Base resets & global defaults ───────────────────────────────────────── */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-900 leading-normal;
+    min-height: 100vh;
+  }
+
+  /* Better focus ring — only visible on keyboard navigation */
+  :focus-visible {
+    @apply outline-none ring-2 ring-indigo-500 ring-offset-2;
+  }
+
+  /* Remove default focus ring for mouse users */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* Scrollbar styling (Chrome/Edge) */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400;
+  }
+
+  /* Links */
+  a {
+    @apply text-indigo-600 hover:text-indigo-700;
+    text-decoration: none;
+  }
+
+  /* Headings */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold text-gray-900 leading-tight;
+  }
+
+  /* Form elements */
+  input, textarea, select, button {
+    font-family: inherit;
+  }
+
+  /* Images */
+  img, video {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+}
+
+/* ── Component layer — reusable class patterns ───────────────────────────── */
+@layer components {
+
+  /* Page wrapper — used inside layouts */
+  .page-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8;
+  }
+
+  /* Card base */
+  .card {
+    @apply bg-white rounded-2xl border border-gray-100 shadow-sm;
+  }
+
+  /* Form group spacing */
+  .form-group {
+    @apply flex flex-col gap-1.5;
+  }
+
+  /* Divider */
+  .divider {
+    @apply border-t border-gray-100 my-4;
+  }
+
+  /* Text truncate single line */
+  .truncate-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+  }
+
+  /* Text truncate multi-line */
+  .truncate-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .truncate-3 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+  }
+}
+
+/* ── Utility layer — one-off helpers ─────────────────────────────────────── */
+@layer utilities {
+
+  /* Hide scrollbar while preserving scroll behaviour */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Glassmorphism backdrop */
+  .glass {
+    @apply bg-white/70 backdrop-blur-md;
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    @apply bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent;
+  }
+
+  /* Full-screen centered flex */
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+
+  /* Responsive grid auto-fill */
+  .grid-auto-fill {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+
+  /* Aspect ratio helpers */
+  .aspect-card    { aspect-ratio: 4 / 3; }
+  .aspect-banner  { aspect-ratio: 16 / 5; }
+  .aspect-square  { aspect-ratio: 1 / 1; }
+}
+
+/* ── Page-transition animation ───────────────────────────────────────────── */
+.page-enter {
+  animation: fadeIn 200ms ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+
+/* ── NProgress bar (if you add nprogress later) ──────────────────────────── */
+#nprogress .bar {
+  background: var(--color-primary) !important;
+  height: 3px !important;
 }

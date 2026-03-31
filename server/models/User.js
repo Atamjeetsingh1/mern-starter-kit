@@ -44,6 +44,7 @@ const userSchema = new mongoose.Schema(
       default: USER_ROLES.CUSTOMER,
     },
 
+    // ── Media ──────────────────────────────────────────────────────────────
     avatar: {
       type: String,
       default: null,   // Cloudinary secure_url stored here after upload
@@ -59,10 +60,19 @@ const userSchema = new mongoose.Schema(
       type: String,
       select: false,
     },
-    // avatar: {
-    //   type: String,
-    //   default: null,
-    // },
+
+    // ── Password reset ─────────────────────────────────────────────────
+    // Stores SHA-256 hash of the plain token sent to the user's email.
+    // Plain token is NEVER stored — only the hash for comparison.
+    resetPasswordToken: {
+      type: String,
+      select: false,        // Never returned in queries by default
+    },
+    // Token expiry — set to 15 min from generation time
+    resetPasswordExpire: {
+      type: Date,
+      select: false,
+    },
 
     isActive: {
       type: Boolean,
@@ -77,6 +87,8 @@ const userSchema = new mongoose.Schema(
       transform(doc, ret) {
         delete ret.password;
         delete ret.refreshToken;
+        delete ret.resetPasswordToken;
+        delete ret.resetPasswordExpire;
         return ret;
       },
     },
@@ -89,11 +101,12 @@ const userSchema = new mongoose.Schema(
 // userSchema.index({ role: 1, createdAt: -1 });
 
 // ── Pre-save hook: hash password on create / password change ──────────────
-userSchema.pre("save", async function () {
+userSchema.pre("save", async function (next) {
   // Only hash if the password field was modified
-  if (!this.isModified("password")) return;
+  if (!this.isModified("password")) return next();
 
   this.password = await hashPassword(this.password);
+  next();
 });
 
 // ── Instance method: expose role check ────────────────────────────────────

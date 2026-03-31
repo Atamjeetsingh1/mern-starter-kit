@@ -26,4 +26,9 @@ export const refreshTokenApi = (payload) =>
 
 export const logoutApi = () =>
   axiosInstance.post("/auth/logout");
-
+
+export const forgotPasswordApi = (data) =>
+  axiosInstance.post("/auth/forgot-password", data);
+
+export const resetPasswordApi = (data) =>
+  axiosInstance.post("/auth/reset-password", data);
