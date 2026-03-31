@@ -24,7 +24,7 @@ import {
   UserIcon, ChartIcon,
 } from "../components/IconCollection";
 import Avatar from "../components/Avatar";
-import Tooltip from "../components/Tooltip";
+import Tooltip from "../components/ToolTip";
 
 // ── Nav item definition ────────────────────────────────────────────────────
 const buildNavItems = ({ isAdmin, isProvider }) => [
@@ -106,11 +106,11 @@ const SidebarContent = ({ collapsed, onToggle, onMobileClose, isMobile }) => {
             <span className="font-bold text-gray-900 text-base">MERN App</span>
           </div>
         )}
-        {collapsed && (
+        {/* {collapsed && (
           <div className="h-8 w-8 rounded-lg bg-indigo-600 flex items-center justify-center">
-            <Icon name="loading" size={16} className="text-white" />
+            <Icon name="loading" size={10} className="text-white" />
           </div>
-        )}
+        )} */}
 
         {/* Desktop collapse toggle / Mobile close */}
         {isMobile ? (
@@ -129,7 +129,7 @@ const SidebarContent = ({ collapsed, onToggle, onMobileClose, isMobile }) => {
       </div>
 
       {/* ── Nav groups ────────────────────────────────────────────────── */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
+      <nav className="flex-1 px-3 py-4 space-y-6">
         {navItems.map((group) => {
           const visibleItems = group.items.filter((item) =>
             !item.roles || item.roles.some((r) => hasRole(r))

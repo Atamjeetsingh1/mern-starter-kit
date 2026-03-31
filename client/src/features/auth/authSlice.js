@@ -5,7 +5,8 @@
  */
 
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { loginApi, registerApi, logoutApi, getMeApi } from "../../api/auth.api";
+import { loginApi, registerApi, logoutApi } from "../../api/auth.api";
+import { getMyProfileApi } from "../../api/user.api";
 import {
   setTokens,
   setStoredUser,
@@ -68,7 +69,7 @@ export const fetchCurrentUser = createAsyncThunk(
   "auth/fetchMe",
   async (_, { rejectWithValue }) => {
     try {
-      const { data } = await getMeApi();
+      const { data } = await getMyProfileApi();
       return data.data.user;
     } catch (err) {
       return rejectWithValue(

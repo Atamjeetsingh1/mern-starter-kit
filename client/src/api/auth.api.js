@@ -26,6 +26,4 @@ export const refreshTokenApi = (payload) =>
 
 export const logoutApi = () =>
   axiosInstance.post("/auth/logout");
-
-export const getMeApi = () =>
-  axiosInstance.get("/auth/me");
+

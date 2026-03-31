@@ -11,9 +11,12 @@ const {
   updateUser,
   deleteUser,
 } = require("../controllers/user.controller");
+const { uploadAvatar } = require("../controllers/upload.controller");
 const { protect } = require("../middleware/auth.middleware");
 const { authorise } = require("../middleware/role.middleware");
 const asyncHandler = require("../middleware/asyncHandler");
+const { uploadSingle, cloudinaryUpload, UPLOAD_FOLDERS } = require("../middleware/upload");
+const { ALLOWED_IMAGE_TYPES } = require("../constants/upload.constants");
 
 const router = Router();
 
@@ -22,6 +25,14 @@ router.use(protect);
 
 // ── /api/v1/users/profile ──────────────────────────────────────────────────
 router.get("/profile", asyncHandler(getMyProfile));
+
+// ── /api/v1/users/avatar ───────────────────────────────────────────────────
+router.post(
+  "/avatar",
+  uploadSingle("avatar", { allowedTypes: ALLOWED_IMAGE_TYPES }),
+  cloudinaryUpload({ folder: UPLOAD_FOLDERS.USERS }),
+  asyncHandler(uploadAvatar)
+);
 
 // ── /api/v1/users ─────────────────────────────────────────────────────────
 router

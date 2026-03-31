@@ -32,6 +32,9 @@ const ICONS = {
   close: (
     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
   ),
+  x: (
+    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+  ),
   chevronDown: (
     <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
   ),
@@ -171,6 +174,10 @@ const ICONS = {
     <path strokeLinecap="round" strokeLinejoin="round"
       d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
   ),
+  shield: (
+    <path strokeLinecap="round" strokeLinejoin="round"
+      d="M9 12.75l3 3m0 0l3-3m-3 3v-6m-1.5 9a9 9 0 100-18 9 9 0 000 18zm0 0h.008v.008H12v-.008z" />
+  ),
   externalLink: (
     <path strokeLinecap="round" strokeLinejoin="round"
       d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
@@ -184,9 +191,9 @@ const ICONS = {
  */
 export const Icon = ({
   name,
-  size        = 20,
+  size = 20,
   strokeWidth = 1.5,
-  className   = "",
+  className = "",
   ...rest
 }) => {
   const paths = ICONS[name];
@@ -217,30 +224,30 @@ export const Icon = ({
 };
 
 // ── Named icon shortcuts (convenient for common ones) ──────────────────────
-export const HomeIcon       = (p) => <Icon name="home"        {...p} />;
-export const DashboardIcon  = (p) => <Icon name="dashboard"   {...p} />;
-export const UserIcon       = (p) => <Icon name="user"        {...p} />;
-export const UsersIcon      = (p) => <Icon name="users"       {...p} />;
-export const SearchIcon     = (p) => <Icon name="search"      {...p} />;
-export const PlusIcon       = (p) => <Icon name="plus"        {...p} />;
-export const EditIcon       = (p) => <Icon name="edit"        {...p} />;
-export const TrashIcon      = (p) => <Icon name="trash"       {...p} />;
-export const SettingsIcon   = (p) => <Icon name="settings"    {...p} />;
-export const LogoutIcon     = (p) => <Icon name="logout"      {...p} />;
-export const BellIcon       = (p) => <Icon name="bell"        {...p} />;
-export const CheckIcon      = (p) => <Icon name="check"       {...p} />;
-export const CloseIcon      = (p) => <Icon name="close"       {...p} />;
-export const EyeIcon        = (p) => <Icon name="eye"         {...p} />;
-export const EyeOffIcon     = (p) => <Icon name="eyeOff"      {...p} />;
-export const MailIcon       = (p) => <Icon name="mail"        {...p} />;
-export const LockIcon       = (p) => <Icon name="lock"        {...p} />;
-export const MenuIcon       = (p) => <Icon name="menu"        {...p} />;
-export const ChevronDownIcon  = (p) => <Icon name="chevronDown"  {...p} />;
-export const ChevronLeftIcon  = (p) => <Icon name="chevronLeft"  {...p} />;
+export const HomeIcon = (p) => <Icon name="home"        {...p} />;
+export const DashboardIcon = (p) => <Icon name="dashboard"   {...p} />;
+export const UserIcon = (p) => <Icon name="user"        {...p} />;
+export const UsersIcon = (p) => <Icon name="users"       {...p} />;
+export const SearchIcon = (p) => <Icon name="search"      {...p} />;
+export const PlusIcon = (p) => <Icon name="plus"        {...p} />;
+export const EditIcon = (p) => <Icon name="edit"        {...p} />;
+export const TrashIcon = (p) => <Icon name="trash"       {...p} />;
+export const SettingsIcon = (p) => <Icon name="settings"    {...p} />;
+export const LogoutIcon = (p) => <Icon name="logout"      {...p} />;
+export const BellIcon = (p) => <Icon name="bell"        {...p} />;
+export const CheckIcon = (p) => <Icon name="check"       {...p} />;
+export const CloseIcon = (p) => <Icon name="close"       {...p} />;
+export const EyeIcon = (p) => <Icon name="eye"         {...p} />;
+export const EyeOffIcon = (p) => <Icon name="eyeOff"      {...p} />;
+export const MailIcon = (p) => <Icon name="mail"        {...p} />;
+export const LockIcon = (p) => <Icon name="lock"        {...p} />;
+export const MenuIcon = (p) => <Icon name="menu"        {...p} />;
+export const ChevronDownIcon = (p) => <Icon name="chevronDown"  {...p} />;
+export const ChevronLeftIcon = (p) => <Icon name="chevronLeft"  {...p} />;
 export const ChevronRightIcon = (p) => <Icon name="chevronRight" {...p} />;
-export const CalendarIcon   = (p) => <Icon name="calendar"    {...p} />;
-export const DownloadIcon   = (p) => <Icon name="download"    {...p} />;
-export const FilterIcon     = (p) => <Icon name="filter"      {...p} />;
-export const ChartIcon      = (p) => <Icon name="chart"       {...p} />;
+export const CalendarIcon = (p) => <Icon name="calendar"    {...p} />;
+export const DownloadIcon = (p) => <Icon name="download"    {...p} />;
+export const FilterIcon = (p) => <Icon name="filter"      {...p} />;
+export const ChartIcon = (p) => <Icon name="chart"       {...p} />;
 
 export default Icon;

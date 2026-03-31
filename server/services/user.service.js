@@ -14,6 +14,7 @@ const { HTTP_STATUS, MESSAGES } = require("../constants");
  */
 const getUserById = async (userId) => {
   const user = await User.findById(userId);
+  console.log("Fetched user:", user);
   if (!user || !user.isActive) {
     throw new AppError(MESSAGES.USER_NOT_FOUND, HTTP_STATUS.NOT_FOUND);
   }

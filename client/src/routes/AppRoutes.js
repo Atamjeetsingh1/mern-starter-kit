@@ -10,7 +10,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { ROUTES, USER_ROLES } from "../constants";
 
 // Layouts
-import MainLayout from "../layouts/MainLayout";
+import SidebarLayout from "../layouts/SidebarLayout";
 
 // Pages
 import LoginPage from "../pages/LoginPage";
@@ -39,9 +39,9 @@ const AppRoutes = () => (
       path={ROUTES.DASHBOARD}
       element={
         <PrivateRoute>
-          <MainLayout>
+          <SidebarLayout pageTitle="Dashboard">
             <DashboardPage />
-          </MainLayout>
+          </SidebarLayout>
         </PrivateRoute>
       }
     />
@@ -49,9 +49,9 @@ const AppRoutes = () => (
       path={ROUTES.PROFILE}
       element={
         <PrivateRoute>
-          <MainLayout>
+          <SidebarLayout pageTitle="Profile">
             <ProfilePage />
-          </MainLayout>
+          </SidebarLayout>
         </PrivateRoute>
       }
     />
@@ -62,9 +62,9 @@ const AppRoutes = () => (
       path="/admin"
       element={
         <RoleRoute roles={[USER_ROLES.ADMIN]}>
-          <MainLayout>
+          <SidebarLayout pageTitle="Admin">
             <AdminPage />
-          </MainLayout>
+          </SidebarLayout>
         </RoleRoute>
       }
     /> */}
