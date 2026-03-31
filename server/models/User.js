@@ -44,15 +44,25 @@ const userSchema = new mongoose.Schema(
       default: USER_ROLES.CUSTOMER,
     },
 
+    avatar: {
+      type: String,
+      default: null,   // Cloudinary secure_url stored here after upload
+    },
+
+    coverImage: {
+      type: String,
+      default: null,
+    },
+
     // Stores the hashed refresh token so we can invalidate sessions server-side
     refreshToken: {
       type: String,
       select: false,
     },
-    avatar: {
-      type: String,
-      default: null,
-    },
+    // avatar: {
+    //   type: String,
+    //   default: null,
+    // },
 
     isActive: {
       type: Boolean,
@@ -63,7 +73,7 @@ const userSchema = new mongoose.Schema(
     timestamps: true, // Adds createdAt & updatedAt automatically
     versionKey: false, // Remove __v field
     toJSON: {
-      // Strip sensitive fields when serialising to JSON
+      // Strip all sensitive fields when serialising to JSON responses
       transform(doc, ret) {
         delete ret.password;
         delete ret.refreshToken;

@@ -17,13 +17,5 @@ export const getUserByIdApi = (id) =>
 export const updateUserApi = (id, data) =>
   axiosInstance.patch(`/users/${id}`, data);
 
-export const uploadAvatarApi = (formData) =>
-  axiosInstance.post("/users/avatar", formData, {
-    transformRequest: [(data, headers) => {
-      delete headers["Content-Type"];
-      return data;
-    }],
-  });
-
 export const deleteUserApi = (id) =>
   axiosInstance.delete(`/users/${id}`);
