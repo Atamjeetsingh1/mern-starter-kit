@@ -8,23 +8,23 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import useAuth from "@/hooks/useAuth";
-import useApi from "@/hooks/useApi";
-import { updateUserApi } from "@/api/user.api";
-import { uploadAvatarApi } from "@/api/upload.api";
-import { profileSchema, changePasswordSchema } from "@/utils/validators";
-import { checkPasswordStrength } from "@/utils/validators";
-import Tabs           from "@/components/ui/Tabs";
-import Card           from "@/components/ui/Card";
-import FormInput      from "@/components/forms/FormInput";
-import FormTextarea   from "@/components/forms/FormTextarea";
-import Button         from "@/components/Button";
-import Alert          from "@/components/Alert";
-import Toggle         from "@/components/ui/Toggle";
-import Badge          from "@/components/ui/Badge";
-import AvatarUpload   from "@/components/upload/AvatarUpload";
-import ConfirmDialog  from "@/components/ui/ConfirmDialog";
-import { Icon }       from "@/components/icons/IconCollection";
+import useAuth from "../hooks/useAuth";
+import useApi from "../hooks/useApi";
+import { updateUserApi } from "../api/user.api";
+import { uploadAvatarApi } from "../api/upload.api";
+import { profileSchema, changePasswordSchema } from "../utils/validators";
+import { checkPasswordStrength } from "../utils/validators";
+import Tabs           from "../components/ui/Tabs";
+import Card           from "../components/ui/Card";
+import FormInput      from "../components/forms/FormInput";
+import FormTextarea   from "../components/forms/FormTextarea";
+import Button         from "../components/Button";
+import Alert          from "../components/Alert";
+import Toggle         from "../components/ui/Toggle";
+import Badge          from "../components/ui/Badge";
+import AvatarUpload   from "../components/upload/AvatarUpload";
+import ConfirmDialog  from "../components/ui/ConfirmDialog";
+import { Icon }       from "../components/icons/IconCollection";
 
 // ── Profile tab ────────────────────────────────────────────────────────────
 const ProfileTab = ({ user, fetchMe }) => {

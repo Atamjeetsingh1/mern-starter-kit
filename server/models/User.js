@@ -78,6 +78,27 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+
+    // ── Email verification ─────────────────────────────────────────────────
+    // Set to true after the user clicks the verification link.
+    // Use the requireVerified middleware to gate protected routes.
+    isEmailVerified: {
+      type:    Boolean,
+      default: false,
+      index:   true,   // Allows efficient queries: "find all unverified users"
+    },
+    emailVerificationToken: {
+      type: String,
+      select: false,
+    },
+    emailVerificationOTP: {
+      type: String,
+      select: false,
+    },
+    emailVerificationExpire: {
+      type: Date,
+      select: false,
+    },
   },
   {
     timestamps: true, // Adds createdAt & updatedAt automatically
@@ -89,6 +110,9 @@ const userSchema = new mongoose.Schema(
         delete ret.refreshToken;
         delete ret.resetPasswordToken;
         delete ret.resetPasswordExpire;
+        delete ret.emailVerificationToken;
+        delete ret.emailVerificationOTP;
+        delete ret.emailVerificationExpire;
         return ret;
       },
     },
@@ -101,12 +125,11 @@ const userSchema = new mongoose.Schema(
 // userSchema.index({ role: 1, createdAt: -1 });
 
 // ── Pre-save hook: hash password on create / password change ──────────────
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", async function () {
   // Only hash if the password field was modified
-  if (!this.isModified("password")) return next();
+  if (!this.isModified("password")) return;
 
   this.password = await hashPassword(this.password);
-  next();
 });
 
 // ── Instance method: expose role check ────────────────────────────────────

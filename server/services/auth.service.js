@@ -8,6 +8,7 @@
 const User = require("../models/User");
 const { comparePassword } = require("../utils/password.utils");
 const { generateTokenPair, verifyRefreshToken } = require("../utils/token.utils");
+const emailVerificationService = require("./emailVerification.service");
 const AppError = require("../utils/AppError");
 const { HTTP_STATUS, MESSAGES } = require("../constants");
 
@@ -32,6 +33,11 @@ const registerUser = async ({ name, email, password, role }) => {
   // 4. Persist hashed refresh token for server-side invalidation
   user.refreshToken = tokens.refreshToken;
   await user.save({ validateBeforeSave: false });
+
+  // 5. Trigger Email Verification asynchronously AFTER the first save completes
+  emailVerificationService.generateAndSendVerification(user).catch(err => {
+    console.error("Failed to send verification email during registration:", err);
+  });
 
   return { user, ...tokens };
 };

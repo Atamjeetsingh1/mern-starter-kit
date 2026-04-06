@@ -6,25 +6,25 @@
  */
 
 import React, { useEffect, useState, useCallback } from "react";
-import { getAllUsersApi, deleteUserApi } from "@/api/user.api";
-import useApi from "@/hooks/useApi";
-import usePagination from "@/hooks/usePagination";
-import useDebounce   from "@/hooks/useDebounce";
-import { formatDate, timeAgo } from "@/utils/formatters";
-import { USER_ROLES } from "@/constants";
+import { getAllUsersApi, deleteUserApi } from "../api/user.api";
+import useApi from "../hooks/useApi";
+import usePagination from "../hooks/usePagination";
+import useDebounce   from "../hooks/useDebounce";
+import { formatDate, timeAgo } from "../utils/formatters";
+import { USER_ROLES } from "../constants";
 
-import Card          from "@/components/ui/Card";
-import Table         from "@/components/ui/Table";
-import Pagination    from "@/components/ui/Pagination";
-import SearchBar     from "@/components/ui/SearchBar";
-import Badge         from "@/components/ui/Badge";
-import Avatar        from "@/components/ui/Avatar";
-import Tooltip       from "@/components/ui/Tooltip";
-import ConfirmDialog from "@/components/ui/ConfirmDialog";
-import EmptyState    from "@/components/ui/EmptyState";
-import Skeleton      from "@/components/ui/Skeleton";
-import Button        from "@/components/Button";
-import { Icon }      from "@/components/icons/IconCollection";
+import Card          from "../components/Card";
+import Table         from "../components/Table";
+import Pagination    from "../components/Pagination";
+import SearchBar     from "../components/SearchBar";
+import Badge         from "../components/Badge";
+import Avatar        from "../components/Avatar";
+import Tooltip       from "../components/ToolTip";
+import ConfirmDialog from "../components/ConfirmDialog";
+import EmptyState    from "../components/EmptyState";
+import Skeleton      from "../components/Skeleton";
+import Button        from "../components/Button";
+import { Icon }      from "../components/IconCollection";
 
 // Role → badge color map
 const ROLE_COLOR = {
