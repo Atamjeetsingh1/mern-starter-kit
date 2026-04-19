@@ -20,12 +20,12 @@
 
 const admin       = require("../config/firebase.admin");
 const User        = require("../models/User");
-const jwt         = require("jsonwebtoken");
 const env         = require("../config/env");
 const asyncHandler = require("../middleware/asyncHandler");
 const { sendSuccess } = require("../utils/apiResponse");
 const { HTTP_STATUS, COOKIE_NAMES, MESSAGES, USER_ROLES } = require("../constants");
 const logger      = require("../utils/logger");
+const { signAccessToken, signRefreshToken } = require("../utils/token.utils");
 
 // Map Firebase sign_in_provider to our User model provider enum
 const PROVIDER_MAP = {
@@ -45,12 +45,6 @@ const getCookieOptions = () => ({
   maxAge:    7 * 24 * 60 * 60 * 1000,           // 7 days in ms
   path:      "/",
 });
-
-// ── Helper: sign JWT ───────────────────────────────────────────────────────
-const signToken = (userId) =>
-  jwt.sign({ id: userId }, env.JWT_ACCESS_SECRET, {
-    expiresIn: env.JWT_ACCESS_EXPIRES_IN || "15m",
-  });
 
 // ── Helper: sanitise user for response ────────────────────────────────────
 const sanitiseUser = (user) => ({
@@ -131,49 +125,47 @@ const socialLogin = asyncHandler(async (req, res) => {
     }
 
     // ── 4. Upsert user in MongoDB ─────────────────────────────────────────
-    // findOneAndUpdate with upsert is atomic → safe against race conditions
-    const user = await User.findOneAndUpdate(
-      { email: email.toLowerCase() },
-      {
-        $setOnInsert: {
-          // Only set these on creation — don't overwrite on subsequent logins
-          email:    email.toLowerCase(),
-          role:     USER_ROLES.CUSTOMER,
-          password: undefined, // Social users have no password
-        },
-        $set: {
-          // Always update on login
-          provider:        PROVIDER_MAP[sign_in_provider] || provider,
-          firebaseUid:     uid,
-          isEmailVerified: email_verified ?? true, // Social providers verify email
-          lastLoginAt:     new Date(),
-          // Update name only if we have one AND the stored name is empty
-          ...(name && { $setOnInsert: undefined }), // handled below
-        },
-      },
-      {
-        new:            true,
-        upsert:         true,
-        runValidators:  true,
-        // Return the document after update
-        setDefaultsOnInsert: true,
+    // Fixed approach: findOne → if exists update, if not create
+    // This avoids MongoDB's limitation of using $setOnInsert and $set
+    // on the same field in one operation.
+    const normalizedEmail = email.toLowerCase().trim();
+    let user = await User.findOne({ email: normalizedEmail });
+
+    if (user) {
+      // Existing user — update social fields
+      user.firebaseUid     = uid;
+      user.isEmailVerified = email_verified ?? true;
+      user.lastLoginAt     = new Date();
+      // Only update provider if user was originally local (upgrading to social)
+      if (user.provider === "local") {
+        user.provider = PROVIDER_MAP[sign_in_provider] || provider;
       }
-    );
-
-    // Update name only if empty (e.g. second Apple sign-in won't wipe stored name)
-    if (name && !user.name) {
-      user.name = name;
+      // Only update name if user hasn't set a custom one
+      if (name && (!user.name || user.name === user.email.split("@")[0])) {
+        user.name = name;
+      }
+      // Always update avatar from provider (may have changed)
+      if (picture) {
+        user.avatar = picture;
+      }
+      await user.save({ validateBeforeSave: false });
+    } else {
+      // New user — create with social data
+      user = await User.create({
+        email:           normalizedEmail,
+        name:            name || normalizedEmail.split("@")[0],
+        avatar:          picture || "",
+        provider:        PROVIDER_MAP[sign_in_provider] || provider,
+        firebaseUid:     uid,
+        isEmailVerified: email_verified ?? true,
+        role:            USER_ROLES.CUSTOMER,
+        lastLoginAt:     new Date(),
+        // No password for social users
+      });
     }
-
-    // Update avatar only if empty or changed
-    if (picture && user.avatar !== picture) {
-      user.avatar = picture;
-    }
-
-    await user.save({ validateBeforeSave: false });
 
     // ── 5. Sign JWT + set httpOnly cookie ─────────────────────────────────
-    const token = signToken(user._id);
+    const token = signAccessToken({ id: user._id, role: user.role });
     res.cookie(COOKIE_NAMES.REFRESH_TOKEN, token, getCookieOptions());
 
     logger.info(`[socialLogin] User ${user._id} signed in via ${provider}`);
@@ -183,6 +175,17 @@ const socialLogin = asyncHandler(async (req, res) => {
       user:    sanitiseUser(user),
       accessToken: token, // Also return for Authorization header usage
     });
+}, (err) => {
+  // Handle duplicate key error (race condition on user creation)
+  if (err.code === 11000) {
+    logger.warn("[socialLogin] Duplicate key error:", err.message);
+    const error = new Error(
+      "An account with this email already exists. Please sign in with your original method."
+    );
+    error.statusCode = HTTP_STATUS.CONFLICT;
+    throw error;
+  }
+  throw err;
 });
 
 module.exports = { socialLogin, ALLOWED_PROVIDERS };

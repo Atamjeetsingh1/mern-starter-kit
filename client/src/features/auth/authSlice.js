@@ -5,7 +5,7 @@
  */
 
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { loginApi, registerApi, logoutApi, socialLoginApi } from "../../api/auth.api";
+import { loginApi, registerApi, logoutApi, socialLoginApi, getMeApi } from "../../api/auth.api";
 import { getMyProfileApi } from "../../api/user.api";
 import { auth } from "../../config/firebase";
 import { signOut as firebaseSignOut } from "firebase/auth";
@@ -23,6 +23,8 @@ const initialState = {
   isAuthenticated: !!getAccessToken(),
   isLoading: false,
   error: null,
+  isRehydrating: true,   // Track initial session check
+  loadingProvider: null,   // Track which social provider is loading
 };
 
 // ── Async thunks ───────────────────────────────────────────────────────────
@@ -95,12 +97,35 @@ export const socialLogin = createAsyncThunk(
   async ({ idToken, provider }, { rejectWithValue }) => {
     try {
       const { data } = await socialLoginApi({ idToken, provider });
-      return data.user; // { _id, name, email, avatar, role, isEmailVerified }
+      return data; // { user, accessToken }
     } catch (err) {
       // Normalise error shape for consistent UI handling
       return rejectWithValue({
         message: err?.response?.data?.message || err.message || "Social login failed.",
         code:    err?.response?.status || 500,
+      });
+    }
+  }
+);
+
+/**
+ * rehydrateSession
+ * Called on app mount to check if httpOnly cookie is still valid
+ */
+export const rehydrateSession = createAsyncThunk(
+  "auth/rehydrateSession",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await getMeApi();
+      return data.data.user;
+    } catch (err) {
+      // 401 = no valid session — not an error, just not logged in
+      if (err?.response?.status === 401) {
+        return rejectWithValue({ message: "No active session.", code: 401 });
+      }
+      return rejectWithValue({
+        message: err?.message || "Session check failed.",
+        code: err?.response?.status || 0,
       });
     }
   }
@@ -133,7 +158,13 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.isLoading = false;
       state.error  = null;
+      state.isRehydrating = false;
+      state.loadingProvider = null;
       clearAuthStorage();
+    },
+    /** Set which social provider is loading */
+    setLoadingProvider(state, action) {
+      state.loadingProvider = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -208,23 +239,47 @@ const authSlice = createSlice({
       .addCase(socialLogin.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isAuthenticated = true;
-        state.user = action.payload;
-        setStoredUser(action.payload);
-        // Note: Access token is in httpOnly cookie, not stored in Redux
+        state.user = action.payload.user;
+        state.loadingProvider = null;
+        setStoredUser(action.payload.user);
+        // Store access token in localStorage for Authorization header
+        if (action.payload.accessToken) {
+          localStorage.setItem('accessToken', action.payload.accessToken);
+        }
       })
       .addCase(socialLogin.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload?.message || "Social login failed.";
+        state.loadingProvider = null;
+      });
+
+    // ── rehydrateSession ────────────────────────────────────────────────
+    builder
+      .addCase(rehydrateSession.pending, (state) => {
+        state.isRehydrating = true;
+      })
+      .addCase(rehydrateSession.fulfilled, (state, action) => {
+        state.isRehydrating = false;
+        state.isAuthenticated = true;
+        state.user = action.payload;
+        setStoredUser(action.payload);
+      })
+      .addCase(rehydrateSession.rejected, (state) => {
+        state.isRehydrating = false;
+        state.isAuthenticated = false;
+        state.user = null;
       });
   },
 });
 
-export const { clearError, forceLogout, resetError, resetAuth } = authSlice.actions;
+export const { clearError, forceLogout, resetError, resetAuth, setLoadingProvider } = authSlice.actions;
 
 // ── Selectors ──────────────────────────────────────────────────────────────
 export const selectCurrentUser = (state) => state.auth.user;
 export const selectIsAuthenticated = (state) => state.auth.isAuthenticated;
 export const selectAuthLoading = (state) => state.auth.isLoading;
 export const selectAuthError = (state) => state.auth.error;
+export const selectIsRehydrating = (state) => state.auth.isRehydrating;
+export const selectLoadingProvider = (state) => state.auth.loadingProvider;
 
 export default authSlice.reducer;

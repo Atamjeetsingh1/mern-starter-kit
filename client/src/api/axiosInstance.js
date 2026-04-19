@@ -22,6 +22,7 @@ const axiosInstance = axios.create({
   baseURL: BASE_URL,
   headers: { "Content-Type": "application/json" },
   timeout: 10_000, // 10 s
+  withCredentials: true, // Required to send/receive cookies
 });
 
 // ── Request interceptor — attach access token ──────────────────────────────
@@ -52,6 +53,11 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+
+    // During rehydration: 401 just means no cookie. Don't redirect.
+    if (error.response?.status === 401 && originalRequest._isRehydration) {
+      return Promise.reject(error);
+    }
 
     // Only attempt a refresh on 401 and only once per request
     if (error.response?.status !== 401 || originalRequest._retry) {
@@ -85,7 +91,7 @@ axiosInstance.interceptors.response.use(
       // Use a plain axios call (not the instance) to avoid interceptor loops
       const { data } = await axios.post(`${BASE_URL}/auth/refresh`, {
         refreshToken,
-      });
+      }, { withCredentials: true });
 
       const { accessToken, refreshToken: newRefreshToken } = data.data;
       setTokens(accessToken, newRefreshToken);

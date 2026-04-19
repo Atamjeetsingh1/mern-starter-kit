@@ -39,3 +39,12 @@ export const resetPasswordApi = (data) =>
  */
 export const socialLoginApi = (data) =>
   axiosInstance.post("/auth/social-login", data);
+
+/**
+ * Get current user - used for session rehydration
+ * Checks if httpOnly cookie is still valid
+ */
+export const getMeApi = () =>
+  axiosInstance.get("/auth/me", {
+    _isRehydration: true, // Flag for interceptor to suppress redirect on 401
+  });

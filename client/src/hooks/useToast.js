@@ -57,6 +57,8 @@ export const ToastProvider = ({ children, duration = 4000 }) => {
     warning: (msg, dur) => addToast(msg, "warning", dur),
     info:    (msg, dur) => addToast(msg, "info",    dur),
     dismiss,
+    // Backwards-compatible helper: showToast("message", "type")
+    showToast: (msg, type = "info", dur) => addToast(msg, type, dur),
   };
 
   return (

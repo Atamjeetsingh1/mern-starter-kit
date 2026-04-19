@@ -28,7 +28,12 @@ const { HTTP_STATUS } = require("./constants");
 const app = express();
 
 // ── Security headers ───────────────────────────────────────────────────────
-app.use(helmet());
+// Configure helmet to allow Firebase popup authentication
+// COOP must be 'unsafe-none' or not set for cross-origin popups to work
+app.use(helmet({
+  crossOriginOpenerPolicy: false, // Disable COOP to allow Firebase popup
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+}));
 
 // ── CORS ───────────────────────────────────────────────────────────────────
 app.use(
@@ -110,6 +115,11 @@ app.get("/health", (_req, res) => {
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/upload", uploadRoutes);
+
+// ── Feature flags stub (returns empty flags) ─────────────────────────────
+app.get("/api/v1/feature-flags", (_req, res) => {
+  res.json({ success: true, data: { flags: {} } });
+});
 
 // ── 404 handler (must come after all routes) ──────────────────────────────
 app.use((req, _res, next) => {

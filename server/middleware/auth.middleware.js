@@ -2,11 +2,15 @@
  * middleware/auth.middleware.js
  * Verifies the Bearer access token on protected routes.
  * Attaches { id, role } to req.user on success.
+ *
+ * Supports two auth methods:
+ *  1. Authorization: Bearer <token> header (standard)
+ *  2. httpOnly cookie named "refreshToken" (for social login session persistence)
  */
 
 const { verifyAccessToken } = require("../utils/token.utils");
 const AppError = require("../utils/AppError");
-const { HTTP_STATUS, MESSAGES } = require("../constants");
+const { HTTP_STATUS, MESSAGES, COOKIE_NAMES } = require("../constants");
 const asyncHandler = require("./asyncHandler");
 
 /**
@@ -14,18 +18,24 @@ const asyncHandler = require("./asyncHandler");
  * Attach decoded payload to req.user.
  */
 const protect = asyncHandler(async (req, _res, next) => {
-  // 1. Extract token from Authorization header
+  let token = null;
+
+  // 1. Try to get token from Authorization header
   const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    throw new AppError(MESSAGES.UNAUTHORIZED, HTTP_STATUS.UNAUTHORIZED);
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    token = authHeader.split(" ")[1];
   }
 
-  const token = authHeader.split(" ")[1];
+  // 2. Fallback: check httpOnly cookie (for social login session persistence)
+  if (!token && req.cookies && req.cookies[COOKIE_NAMES.REFRESH_TOKEN]) {
+    token = req.cookies[COOKIE_NAMES.REFRESH_TOKEN];
+  }
+
   if (!token) {
     throw new AppError(MESSAGES.UNAUTHORIZED, HTTP_STATUS.UNAUTHORIZED);
   }
 
-  // 2. Verify token
+  // 3. Verify token
   let decoded;
   try {
     decoded = verifyAccessToken(token);
@@ -34,7 +44,7 @@ const protect = asyncHandler(async (req, _res, next) => {
     throw new AppError(MESSAGES.INVALID_TOKEN, HTTP_STATUS.UNAUTHORIZED);
   }
 
-  // 3. Attach to request
+  // 4. Attach to request
   req.user = { id: decoded.id, role: decoded.role };
   next();
 });
