@@ -30,9 +30,27 @@ const userSchema = new mongoose.Schema(
 
     password: {
       type: String,
-      required: [true, "Password is required."],
+      required: function() {
+        // Password is required only for local (email/password) users
+        return this.provider === "local" || !this.provider;
+      },
       minlength: [8, "Password must be at least 8 characters."],
       select: false, // Never return password in query results by default
+    },
+
+    // ── Social Login ────────────────────────────────────────────────────────
+    provider: {
+      type: String,
+      enum: ["local", "google", "facebook", "apple"],
+      default: "local",
+    },
+    firebaseUid: {
+      type: String,
+      sparse: true, // Allows multiple nulls (for local users)
+      unique: true,
+    },
+    lastLoginAt: {
+      type: Date,
     },
 
     role: {
@@ -126,8 +144,8 @@ const userSchema = new mongoose.Schema(
 
 // ── Pre-save hook: hash password on create / password change ──────────────
 userSchema.pre("save", async function () {
-  // Only hash if the password field was modified
-  if (!this.isModified("password")) return;
+  // Only hash if the password field was modified and exists
+  if (!this.isModified("password") || !this.password) return;
 
   this.password = await hashPassword(this.password);
 });

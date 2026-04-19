@@ -32,3 +32,10 @@ export const forgotPasswordApi = (data) =>
 
 export const resetPasswordApi = (data) =>
   axiosInstance.post("/auth/reset-password", data);
+
+/**
+ * Social login - sends Firebase ID token to backend
+ * @param {{ idToken: string, provider: string }} data
+ */
+export const socialLoginApi = (data) =>
+  axiosInstance.post("/auth/social-login", data);

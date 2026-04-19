@@ -5,8 +5,10 @@
  */
 
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { loginApi, registerApi, logoutApi } from "../../api/auth.api";
+import { loginApi, registerApi, logoutApi, socialLoginApi } from "../../api/auth.api";
 import { getMyProfileApi } from "../../api/user.api";
+import { auth } from "../../config/firebase";
+import { signOut as firebaseSignOut } from "firebase/auth";
 import {
   setTokens,
   setStoredUser,
@@ -57,10 +59,13 @@ export const logoutUser = createAsyncThunk(
   "auth/logout",
   async (_, { rejectWithValue }) => {
     try {
+      // Firebase sign-out (best-effort — don't block on failure)
+      await firebaseSignOut(auth).catch(() => {});
       await logoutApi();
     } catch (err) {
-      // Even if the server call fails, we clear local storage
-      return rejectWithValue(err.response?.data?.message);
+      return rejectWithValue({
+        message: err?.response?.data?.message || "Logout failed.",
+      });
     }
   }
 );
@@ -79,6 +84,28 @@ export const fetchCurrentUser = createAsyncThunk(
   }
 );
 
+/**
+ * socialLogin
+ * 1. Receives the Firebase IdToken from useSocialAuth hook.
+ * 2. Sends it to the Express backend.
+ * 3. Backend verifies, upserts user, sets httpOnly JWT cookie, returns user.
+ */
+export const socialLogin = createAsyncThunk(
+  "auth/socialLogin",
+  async ({ idToken, provider }, { rejectWithValue }) => {
+    try {
+      const { data } = await socialLoginApi({ idToken, provider });
+      return data.user; // { _id, name, email, avatar, role, isEmailVerified }
+    } catch (err) {
+      // Normalise error shape for consistent UI handling
+      return rejectWithValue({
+        message: err?.response?.data?.message || err.message || "Social login failed.",
+        code:    err?.response?.status || 500,
+      });
+    }
+  }
+);
+
 // ── Slice ──────────────────────────────────────────────────────────────────
 
 const authSlice = createSlice({
@@ -93,6 +120,19 @@ const authSlice = createSlice({
     forceLogout(state) {
       state.user = null;
       state.isAuthenticated = false;
+      clearAuthStorage();
+    },
+    /** Reset error state (useful before retrying) */
+    resetError(state) {
+      state.error  = null;
+      state.isLoading = false;
+    },
+    /** Force-reset — e.g. on 401 interceptor */
+    resetAuth(state) {
+      state.user   = null;
+      state.isAuthenticated = false;
+      state.isLoading = false;
+      state.error  = null;
       clearAuthStorage();
     },
   },
@@ -158,10 +198,28 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         clearAuthStorage();
       });
+
+    // ── socialLogin ─────────────────────────────────────────────────────
+    builder
+      .addCase(socialLogin.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(socialLogin.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isAuthenticated = true;
+        state.user = action.payload;
+        setStoredUser(action.payload);
+        // Note: Access token is in httpOnly cookie, not stored in Redux
+      })
+      .addCase(socialLogin.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload?.message || "Social login failed.";
+      });
   },
 });
 
-export const { clearError, forceLogout } = authSlice.actions;
+export const { clearError, forceLogout, resetError, resetAuth } = authSlice.actions;
 
 // ── Selectors ──────────────────────────────────────────────────────────────
 export const selectCurrentUser = (state) => state.auth.user;

@@ -13,8 +13,9 @@
  *   GET  /verification-status      → check status (protected)
  */
 
-const { Router } = require("express");//
+const { Router } = require("express");
 const authController                = require("../controllers/auth.controller");
+const socialAuthController          = require("../controllers/auth.social.controller");
 const passwordController            = require("../controllers/password.controller");
 const emailVerificationController   = require("../controllers/emailVerification.controller");
 const { protect }                   = require("../middleware/auth.middleware");
@@ -56,6 +57,10 @@ const resendLimiter = rateLimit({
 router.post("/register", validateRegister,     authController.register);
 router.post("/login",    validateLogin,         authController.login);
 router.post("/refresh",  validateRefreshToken,  authController.refreshToken);
+
+// ── Public: social login ────────────────────────────────────────────────────
+// POST /auth/social-login  { idToken: string, provider: "google"|"facebook"|"apple" }
+router.post("/social-login", socialAuthController.socialLogin);
 
 // ── Public: password reset flow ────────────────────────────────────────────
 router.post("/forgot-password",

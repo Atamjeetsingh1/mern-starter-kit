@@ -11,6 +11,7 @@ import AuthLayout from "../layouts/AuthLayout";
 import Input from "../components/Input";
 import Button from "../components/Button";
 import Alert from "../components/Alert";
+import SocialAuthButtons from "../components/SocialAuthButtons";
 
 const INITIAL_FORM = { email: "", password: "" };
 
@@ -62,6 +63,19 @@ const LoginPage = () => {
       footerLinkText="Create one"
       footerLinkTo={ROUTES.REGISTER}
     >
+      {/* Social login buttons */}
+      <SocialAuthButtons mode="login" disabled={isLoading} />
+
+      {/* Divider */}
+      <div className="relative my-6">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-gray-200" />
+        </div>
+        <div className="relative flex justify-center text-sm">
+          <span className="bg-white px-3 text-gray-500">Or continue with email</span>
+        </div>
+      </div>
+
       <form onSubmit={handleSubmit} noValidate className="space-y-5">
         {/* Server-level error */}
         {error && (
