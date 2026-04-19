@@ -6,12 +6,12 @@
 
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "../features/auth/authSlice";
+import notificationReducer from "../features/notifications/notificationSlice";
 
 const store = configureStore({
   reducer: {
     auth: authReducer,
-    // Add more slices here, e.g.:
-    // users: usersReducer,
+    notifications: notificationReducer,
   },
   devTools: import.meta.env.DEV, // Enable Redux DevTools only in development
 });

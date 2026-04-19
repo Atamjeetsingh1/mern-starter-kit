@@ -17,7 +17,8 @@ import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
 import DashboardPage from "../pages/DashboardPage";
 import ProfilePage from "../pages/ProfilePage";
- import NotFoundPage from "../pages/NotFoundPage";
+import NotificationsPage from "../pages/NotificationsPage";
+import NotFoundPage from "../pages/NotFoundPage";
 import UnauthorizedPage from "../pages/UnauthorizedPage";
 
 // Guards
@@ -51,6 +52,16 @@ const AppRoutes = () => (
         <PrivateRoute>
           <SidebarLayout pageTitle="Profile">
             <ProfilePage />
+          </SidebarLayout>
+        </PrivateRoute>
+      }
+    />
+    <Route
+      path={ROUTES.NOTIFICATIONS}
+      element={
+        <PrivateRoute>
+          <SidebarLayout pageTitle="Notifications">
+            <NotificationsPage />
           </SidebarLayout>
         </PrivateRoute>
       }

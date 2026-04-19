@@ -57,6 +57,14 @@ export const logoutUser = createAsyncThunk(
   "auth/logout",
   async (_, { rejectWithValue }) => {
     try {
+      // Remove FCM token before logout
+      const fcmToken = localStorage.getItem("fcm_token");
+      if (fcmToken) {
+        const { removeDeviceTokenApi } = await import("../../api/notification.api");
+        await removeDeviceTokenApi(fcmToken).catch(() => {});
+        localStorage.removeItem("fcm_token");
+      }
+
       await logoutApi();
     } catch (err) {
       // Even if the server call fails, we clear local storage

@@ -8,6 +8,7 @@
  */
 
 const authService = require("../services/auth.service");
+const notificationService = require("../services/notification.service");
 const { sendSuccess } = require("../utils/apiResponse");
 const { HTTP_STATUS, MESSAGES, COOKIE_NAMES } = require("../constants");
 const env = require("../config/env");
@@ -35,6 +36,14 @@ const setRefreshTokenCookie = (res, token) => {
  */
 const register = async (req, res) => {
   const { user, accessToken, refreshToken } = await authService.registerUser(req.body);
+
+  // Send welcome notification (non-blocking)
+  notificationService.sendNotification({
+    userId: user._id,
+    type: 'WELCOME',
+    data: { name: user.name },
+    channels: ['push']
+  }).catch(() => {}); // Silently fail if notification fails
 
   setRefreshTokenCookie(res, refreshToken);
 

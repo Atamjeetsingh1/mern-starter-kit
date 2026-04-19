@@ -21,5 +21,6 @@ export const ROUTES = Object.freeze({
   REGISTER:  "/register",
   DASHBOARD: "/dashboard",
   PROFILE:   "/profile",
+  NOTIFICATIONS: "/notifications",
   UNAUTHORIZED: "/unauthorized",
 });
